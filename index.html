@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, shrink-to-fit=no, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Social Data Analysis and Visualization 02806</title>
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.2/d3.min.js"></script>
+    <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+    <script src="js/jquery.waypoints.js"></script>
+    <script src="js/jquery.counterup.js"></script>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/map.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:500|Ubuntu" rel="stylesheet">
+    <script>
+       jQuery(document).ready(function($) {
+           $('.counter').counterUp({
+               delay: 10,
+               time: 1000
+           });
+       });
+   </script>
+
+</head>
+
+<body>
+
+
+            <!-- Full Width Image Header -->
+            <header class="header-image">
+                <div class="headline">
+                    <div class="jumbotron container" style="border-radius:10px; background:rgba(0,0,0,0.5)">
+                        <h1>Predicting Yelp reviews in Las Vegas</h1>
+                        <h2>Social Data Analysis and Visualization 02806</h2>
+                    </div>
+                </div>
+            </header>
+        <!-- Page Content -->
+            <div class="container">
+                <div id="video" class="row">
+                    <h1>Introductory Video</h1>
+                    <div class="col-md-12">
+                        <iframe width="100%" height="480" src="https://www.youtube.com/embed/jJent4VyE88" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <div id="introduction" class="row">
+                    <h1>Introduction</h1>
+                    <p>
+                        Las Vegas is a major resort city located in the middle of the Mojave dessert.
+                        It is known primarily for its gambling, shopping, fine dining, entertainment, and nightlife.
+                    </p>
+
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" src="./public/img/las-vegas-intro.jpg" alt="" />
+                    </div>
+                    <p>
+                    Las Vegas is the home of over 25.000 local businesses, within the above mentioned categories.
+                    We seek to find out what makes a business popular with its customers by predicting a <b>Star Rating</b>. Is it "Location Location Location!" or is free Wi-fi the way to go? <b>Let's see</b>
+                    </p>
+                </div>
+                <div id="data" class="row">
+                    <h1>The Data</h1>
+                    <p>
+                        The data we will be using for this analysis is the data provided by Round 9 Of The Yelp Student Dataset Challenge.
+                        The data spans 11 cities over 4 countries. If you're a student or a professor the full dataset can be aquired here <a href="https://www.yelp.dk/dataset_challenge/">Yelp Dataset Challenge Round 9</a>
+                        Due to the term agreements from Yelp we are not allowed to directly re-distribute the data ourselves. So if you want to play, visit <a href="https://www.yelp.dk/dataset_challenge/">Yelp Dataset Challenge Round 9</a>
+                        <br /><br />
+                        And if you haven't noticed yet, we have chosen to work with one city: <b>Las Vegas</b>
+                    </br>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block" src="./public/img/yelp-logo.jpg" alt="" />
+                    </div>
+                    <p>
+                        The data consists of information regarding busisesses, users and reviews. This amounts to:
+                    </p>
+                <div class="row" style="text-align: center;">
+
+                    <div class="col-xs-4">
+                        <p class="counter large">
+                            27273
+                        </p>
+                        <div class="large">
+                            Businesses
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <p class="counter large">
+                            1427825
+                        </p>
+                        <div class="large">
+                            Reviews
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <p class="counter large">
+                            423785
+                        </p>
+                        <div class="large">
+                            Users
+                        </div>
+                    </div>
+                </div>
+                <br /><br />
+                <p>
+                    We will use this information to figure out the most important aspects of a business according to the users of Yelp.
+                </p>
+                <p class="json">
+                    A Yelp business has various attributes such as location, star rating, review count, a set of attributes and a set of categories. We will look into some of these features later.
+
+                <br /><br />
+                    We will primarily work with businesses when we get into our data analysis and star predictions. An example can be seen below.
+               </p>
+<pre>
+<code>
+    {
+        "business_id":"encrypted business id",
+        "name":"business name",
+        "neighborhood":"hood name",
+        "address":"full address",
+        "city":"city",
+        "state":"state -- if applicable --",
+        "postal code":"postal code",
+        "latitude":latitude,
+        "longitude":longitude,
+        "stars":star rating, rounded to half-stars,
+        "review_count":number of reviews,
+        "is_open":0/1 (closed/open),
+        "attributes":["an array of strings: each array element is an attribute"],
+        "categories":["an array of strings of business categories"],
+        "hours":["an array of strings of business hours"],
+        "type": "business"
+    }
+</code>
+</pre>
+
+                </p>
+            </p>
+                <div class="row">
+                    <h1>
+                        Explainer Notebook
+                    </h1>
+                    <p>
+                        To see how we pre-processed, plotted and analysed our data take a look at our <a href="">explainer notebook.</a>
+                    </p>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" style="width:75%" src="./public/img/explainer.jpg" alt="" />
+                    </div>
+                </div>
+                <div id="map" class="row">
+                    <h1>Explore the businesses of Las Vegas</h1>
+                    <p>
+                        Las Vegas has a lot of businesses, more than we can comfortably plot within this webpage.
+                        <br /><br />
+                        We have taken the liberty to cluster closely located businesses together using a hexagon grid.
+                        The color of the hexagons depicts the median star rating of the clustered businesses and the size depicts the amount of businesses represented by the hexagon. Use the menu in the upper left
+                        corner to filter star ratings and increase or decrease the size of the hexagons to your liking. Hovering over a hexagon displays some additional info.
+                        <br /> <br />Can you find some areas of interest?
+                    </p>
+                    <div id="las-vegas-map">
+
+                    </div>
+
+                </div>
+                <div id="insight" class="row">
+                    <h1>A closer look</h1>
+                    <hr />
+                    <h3>
+                        Kernel Density Estimation
+                    </h3>
+                    <p>
+                        We have visualized the distribution of Yelp businesses using a Kernel Density Estimation map. The businesses generally clusters around the main streets of Las Vegas with the
+                         largest distribution around <b>The Strip</b>
+                    </p>
+                    <div id="kde-div" class="col-md-offset-8 image">
+                         <img id="kde-off" class="center-block shadow" style="width:75%" src="./public/img/kde-off.png" alt="" />
+                    </div>
+                    <script>
+                    var kde_waypoint = new Waypoint({
+                      element: document.getElementById('kde-div'),
+                      handler: function(direction) {
+                          $("#kde-off").fadeOut('fast', function () {
+                              $(this).attr('src', './public/img/kde-on.png');
+                              $(this).fadeIn(1500);
+                          });
+                          this.destroy();
+                    },
+                     offset: '650',
+                     triggerOnce: true
+                 });
+
+                    function fireFade(element){
+                        console.log("fired")
+
+                    }
+                    $(function() {
+                        $("#kde-off").mouseover(function() {
+                            $("#kde-off").fadeOut('fast', function () {
+                                console.log("off");
+                                $(this).attr('src', './public/img/kde-off.png');
+                                $(this).fadeIn('fast');
+                            });
+                        })
+                        $("#kde-off").mouseout(function() {
+                            $("#kde-off").fadeOut('fast',function(){
+                                $(this).attr('src', './public/img/kde-on.png');
+                                $(this).fadeIn(200);
+                            })
+                        });
+                    });
+                    $("#kde-off").change(function(){
+                        var selected = $(this).val();
+                        var image = $("#kde-on");
+
+                    });
+                    </script>
+                </div>
+                <div class="row">
+                    <h3>
+                        The Strip
+                    </h3>
+                    <p>
+                        That bright area you see on the density map is the Las Vegas Strip. It is the place to be according to registered Yelp businesses.
+                        But as you may have discovered on the interactive map just before there is not a single 5 star hexagon in close proximity to the Strip.
+                        The businesses on The Strip clusters around 3 to 3.5 stars.
+                    </p>
+                    <div class="col-md-6">
+                        <img class="center-block shadow" style="width:100%" src="./public/img/thestrip.PNG" alt="" />
+                    </div>
+                    <div class="col-md-6">
+                        <img class="center-block shadow" style="width:100%" src="./public/img/thestrip-google.PNG" alt="" />
+                    </div>
+                    <p>
+                        This suggests that location is not everything, we need to look at the various categories and attributes.
+                    </p>
+                </div>
+                <div class="row">
+                    <h3>
+                        How do Yelp users review?
+                    </h3>
+                    <p>
+                        Let's take a quick look at the various distribution of the data. How are the stars distributed, what are the most common attributes, what is the most popular day to review. Let's see
+                    </p>
+                </div>
+                <div class="row">
+                    <h3>
+                        Distribution of Stars given
+                    </h3>
+                    <hr />
+                    <!-- Plot distribution of stars -->
+                    <div class="col-md-6" id="star-distribution">
+                        <svg id="star-distribution-svg" width="512" height="512"></svg>
+                    </div>
+                    <div class="col-md-6">
+                        <br />
+                        <p>
+                            The most common star rating is 4 stars, closely followed by the 5 star rating. Hover over bars for exact counts.
+                            <br />
+                            <br />
+                            The data is skewed so we want a predictor that will perform better than a model that just guesses on the most frequent star rating.
+                            <hr />
+
+                        </p>
+                    </div>
+                    <!-- Plot selected attributes -->
+
+                    <!-- Plot categories -->
+                    <!-- Pick the most rated businesses and check their attributes -->
+                </div>
+
+                <div class="row">
+                    <h3>
+                        Mean ratings of various categories
+                    </h3>
+                    <hr />
+
+                    <p>
+                        The plot below shows the mean ratings of businesses with a given attribute.
+                    </p>
+                    <br />
+                    <p>
+                        Hover over bars for info.
+                    </p>
+                    <br />
+                    <div class="col-md-12" id="attributes-means">
+                        <svg id="attributes-means-svg" width="1100" height="512"></svg>
+                    </div>
+                    <div>
+                        <br />
+                    </div>
+                    <p>
+                        It becomes clear that the attributes "DriveThru" and "Open24Hours" are associated with poor ratings.
+                        Cultural attributes such as "Asian" and "AfricanAmerican" seems to have higher ratings along with the child related attributes: "Kids" and "Coloring".
+                    </p>
+                </div>
+                <div class="row">
+                    <br />
+                    <h3>
+                        Reviews by day of year and day of week.
+                    </h3>
+                    <hr />
+                    <div class="col-md-6">
+                        <img class="center-block" style="width:100%; height:512px" src="./public/img/reviewdayofweek.PNG" alt="" />
+                    </div>
+                    <div class="col-md-6">
+                        <img class="center-block" style="width:100%; height:512px" src="./public/img/reviewdayofyear.PNG" alt="" />
+                    </div>
+                </div>
+                <div class="row">
+                    <p>
+
+                        Las Vegas is reviewed mostly in the beginning of the week, in the holiday season and in the summer. Monday is the day with most reviews, this is probably
+                        not because monday is the most active day in Las Vegas, but because people review their vacation when they get home.
+                    </p>
+                </div>
+                <div class="row">
+                    <h1>Word Cloud</h1>
+                    <p>
+                    We have looked at review texts and tried to visualize general trends using word clouds. Using a Term Frequency Inverse Document Frequency <b>TF-IDF</b> and a stop word filter, we have tried to generate word clouds for
+                    the different ratings. The only word cloud with somewhat meaninful results is the wordcloud for high ratings, it can be seen below.
+                    </p>
+                    <div class="col-md-12">
+                        <img id="wordcloud" class="center-block" style="width:60%" src="./public/img/wordcloud1.png" alt="" />
+                    </div>
+                    <p>
+                    It does give off a sort of positive vibe doesn't it?
+                    </p>
+                </div>
+                <div class="row">
+                    <h1>The best and the worst</h1>
+                    <p>
+                     What does the best and worst businesses of Las Vegas look like? Let's find out!
+                    </p>
+                    <h2>The best: Brew Tea Bar</h2>
+                    <p>
+                    The best business with a perfect rating of 5 stars and 769 reviews is the Brew Tea bar. They don't serve alcohol, does not have any parking, does not deliver, but serves desserts and has free WiFi
+                    </p>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" src="./public/img/brew-tea.jpg" alt="" />
+                    </div>
+                    <h2>The worst: West Coast Movers</h2>
+                    <p>
+                        The worst business with the unimpressive rating of 1 star and 124 reviews is West Coast Movers.
+                        We can see from the data that they only operate by appointment and the following categories apply: 'Movers', 'Self Storage', 'Local Services', 'Home Services', 'Packing Services'.
+                        <br />
+                        <br />
+                        A sample image from a Yelp user, broken glasses and plates. Could explain the low ratings
+                    </p>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" src="./public/img/west-coast-movers.jpg" alt="" />
+                    </div>
+                </div>
+                <div class="row">
+                    <h1>Predicting Ratings</h1>
+                    <p>
+                        We have now had a good look at the different business types of Las Vegas. We have looked at the data and gained some insight.
+                        Our goal is to see if we can predict ratings for businesses using the Yelp data material. Our pre-eliminary data analysis has
+                        shown that location might not be everything. We have also seen that certain attributes seem to achieve higher ratings than others. We now turn to
+                        <b>Machine Learning</b> to see if we can fit a model that can predict a business star rating given some information about it.
+                        <br /><br />
+                        We will consider the following parameters when predicting the rating: 'latitude', 'longitude', 'review_count', 'attributes', 'categories', 'hours'.
+                        In total there are 1108 different variables.
+                        We have the average yelp star rating for all businesses. They are rounded to the nearest half star, so the ratings can be the following values: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5 and 5.0.
+
+In Machine Learning you typically want to build a prediction model, that is able to give an estimate of what a value is (in our case the star rating of business). It does this by using a mathematical method on given parameters. There are several Machine Learning models available. We will try a couple of these. More specifically we consider the following models:
+<ul>
+  <li>Random Forest</li>
+  <li>Neural Network</li>
+  <li>Linear Regression</li>
+</ul>
+                    </p>
+                    <h3>Random Forest</h3>
+                    <hr/>
+                    <p>
+                    A Random Forest is a Machine Learning model that is an ensemble of another Machine Learning model: The Decision tree. We show an example of a small Decision tree below. The Random Forest is a collections of multiple decisions trees from which it gets its name. A Decision tree is defined by a number splits, in each split you look at one of the given parameters and follow a path down the tree, until you reach the bottom where you find the value that the tree will return as its decision. The Random Forest combines the decisions from all trees to make the final estimate of the value (star rating).
+                    We have fit a Random Forest Regression model over the dataset. Such decision trees become very large so we have decided to plot a small example.
+                    </p>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" style="width:100%" src="./public/img/randomforest.png" alt="" />
+                    </div>
+                    <p>
+                        The small example tree above shows that the following path leads to a score of around 4.0: Is Sunday, Is Fashion, Is not Acne Treatment and is Race tracks. This peculiar path
+                        is just a small example but you get the idea.
+                    </p>
+
+                    <h3>Neural Network</h3>
+                    <hr/>
+                    <p>
+                        A Neural Network is a Machine Learning model that uses a network of nodes and edges. We show an example of small network below.
+                    </p>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block" style="width:60%" src="./public/img/neuralnet.png" alt="" />
+                    </div>
+                    <p>
+                        The model sends the given parameters through the network where different mathematical operations is performed in the nodes and edges.
+                        The final node returns the predicted value. As you can see there are a different number of nodes (called components) in each hidden layer.
+                        The Neural Network makes different predictions depending on the number of nodes and layers. The model we have used in this project contains three hidden layers with 10, 100 and 10 nodes and one output node in the respective layers.
+                    </p>
+
+                    <h3>Multiple Regression and friends</h3>
+                    <hr/>
+                    <p>
+                    We also tried a couple of other Machine learning models but they did not make the cut. (if you are really interested check out the Explainer notebook at the top of this page). A more simple Machine Learning model Linear regression was fitted, but we did not spend too much time on this, because we wanted to use more advanced methods. We call it Multiple regression because we consider more than one input parameter.
+                    </p>
+                </div>
+                <div class="row">
+                    <h1>Feature Selection</h1>
+                    <p>
+                    When training our Machine Learning models we looked at features shared between models. These features were segmented as they appeared in all three models. These are the most prominent features and they might indicate that they are useful when performing regression.
+                    It does not however indicate that all of these attributes lead to a high rating, but rather they have predictive power. Latitude and Longitude are included which suggests that location is important after all.
+                    The features can be seen below in their raw form.
+                    </p>
+                    <pre>
+                        <code>
+                            ['Drugstores',
+                             'Thursday',
+                             'BusinessAcceptsCreditCards',
+                             'Sunday',
+                             'Fast Food',
+                             'Banks & Credit Unions',
+                             'Hair Salons',
+                             'review_count',
+                             'Fitness & Instruction',
+                             'Photographers',
+                             'BikeParking',
+                             'Doctors',
+                             'latitude',
+                             'longitude',
+                             'GoodForKids',
+                             'Hotels & Travel',
+                             'Wednesday',
+                             'ByAppointmentOnly',
+                             'Restaurants',
+                             'Apartments',
+                             'Active Life',
+                             'Property Management',
+                             'Real Estate Agents',
+                             'WheelchairAccessible',
+                             'Real Estate',
+                             'Medical Centers',
+                             'Saturday',
+                             'Event Planning & Services']
+                        </code>
+                    </pre>
+                    <p>
+                        Earlier we looked at some of the attributes with high mean ratings. Some of these attributes occurs on this list, suggesting the trained models has picked up on this. "GoodForKids" and "Hair Salons" both scored high in our
+                        pre-eliminary analysis and they both appear in our selected features.
+                        <br />
+                        <br />
+                        Maybe you will start the next <b>Hair Salon</b> for <b>Kids</b>.
+                    </p>
+                </div>
+                <div class="row">
+                    <h1>Results</h1>
+                    <p>
+                        Now it’s time to see what we actually get when we use these Machine Learning models! This is what we all have been waiting for, <b>right?</b>.
+                        And the results are… reasonable. The plots below show how the different models predicted and what the corresponding true values are.
+                        In order to determine which Machine Learning model is best at predicting Yelp ratings we measure the performance of all models.
+                        We do this by finding the difference between what the model predicted and the true value. This is done for all values, because predictions can be above or below the true value we square them and find the sum.
+                        This gives us the mean squared error (MSE) which tells us how well the model performed. The lower the MSE the better the prediction model.
+                        We want to compare the models’ performances with that of random guessing. 4 is the most frequent rating so this will be our reference point, a model that predicts a star rating of 4 every time, can we do better than that? <b>Hopefully</b>.
+                        The mean squared errors for the three presented models are:
+                    </p>
+                    <ul>
+                        <li>
+                            Guess on 4: 1.1160 MSE
+                        </li>
+                        <li>
+                            Random Forest: 0.7686 MSE
+                        </li>
+                        <li>
+                            Neural Net: 0.7330 MSE
+                        </li>
+                        <li>
+                            Multiple regression: 0.7561 MSE
+                        </li>
+                    </ul>
+                    <p>
+                        All the models perform better than random guessing, in fact they perform more or less the same when we only look at their MSE.
+                        We want to make sure that the predictions actually make sense, i.e. when the true rating is high/low the prediction will also be high/low. The mean squared error is an overall assessment of the prediction errors and can be relatively low if the model keeps guessing a mediocre rating.
+                        We plot our predictions along with the true values. The black lines are the true ratings and the blue is the prediction from the corresponding model. In order to see if the general trends in predictions from a model approximately follow the true general trend we plot the mean for every ten values.
+                        <br />
+                        <br />
+
+                    </p>
+                    <h3>
+                        Random Forest
+                        <hr />
+                    </h3>
+                    <div id="random-forest">
+                        <svg id="random-forest-svg" width="960" height="500"></svg>
+                    </div>
+                    <h3>
+                        Neural Network
+                        <hr />
+                    </h3>
+                    <div id="neural-net">
+                        <svg id="neural-network-svg" width="960" height="500"></svg>
+                    </div>
+                    <h3>
+                        Multiple linear regression
+                        <hr />
+                    </h3>
+                    <div id="multiple-regreesion">
+                        <svg id="multiple-regression-svg" width="960" height="500"></svg>
+                    </div>
+                    <hr />
+                    <p>
+                        It becomes clear that the Random Forest model makes better predictions since it captures the general trend better than the other models.
+                    </p>
+                </div>
+                <div class="row">
+                    <h1>Conclusion</h1>
+
+                    <p>
+                        We have created an interactive map allowing you to explore the rating and position of businesses in Las Vegas. We have found that certain features seem to be more important as they are used by multiple models. We give a suggestion for future business ventures to
+                        start a Hair Salon for Kids and stay open on Sundays. We have looked at attributes which both seemed to have a negative impact on ratings such as "DriveThru" "Fast Food" and "24HourOpen" and attributes with positive impact like: "Hair Salon", "Kids" and "Sunday". We can predict ratings better than largest class guessing.
+                        We find that the Random Forest machine learning model performs the best as it captures the general trend of the data. We can with reasonable results predict the ratings for new businesses given a set of attributes, categories and position.
+                    </p>
+                </div>
+                <div id="map" class="row">
+                    <h1>"Thank you, thank you very much" - Elvis Presley</h1>
+                    <div class="col-md-offset-6 image">
+                         <img class="center-block shadow" style="width:50%" src="./public/img/elvis.jpg" alt="" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <hr />
+                    <a href="https://github.com/suneman/socialdataanalysis2017/">Social Data Analysis 2017</a>
+                    <br />
+                    Class crafted by <a href="https://sunelehmann.com/">Sune Lehmann</a>
+                    <br />
+                    <br />
+                </div>
+            </div>
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#wrapper").toggleClass("toggled");
+    </script>
+
+    <!-- Scroll to heading-->
+    <script>
+        $("ul a[href^='#']").on('click', function(e) {
+
+        // prevent default anchor click behavior
+        e.preventDefault();
+            // animate
+            $('html, body').animate({
+                scrollTop: $(this.hash).offset().top
+            }, 300, function(){
+                // when done, add hash to url
+                // (default click behaviour)
+                window.location.hash = this.hash;
+            });
+        });
+    </script>
+
+</body>
+<script src="business_ratings.js"></script>
+<script src="js/preds.js"></script>
+<script src="js/stats.js"></script>
+
+<script src="js/las-vegas-map.js"></script>
+</html>

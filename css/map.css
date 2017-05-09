@@ -1,0 +1,87 @@
+.features{
+    stroke-width: 3px;
+    stroke: forestgreen;
+}
+
+.bar {
+  fill: tomato;
+}
+.legendCells{
+    font-size:22px;
+}
+.bar:hover {
+  fill: brown;
+}
+.features{
+    fill: wheat
+}
+.hidden {
+       display: none;
+ }
+
+ div.tooltip {
+       color: #222;
+       font-size: 18px;
+       background-color: #fff;
+       padding: .5em;
+       text-shadow: #f5f5f5 0 1px 0;
+       border-radius: 2px;
+       opacity: 0.9;
+   }
+
+#map{
+    position: relative;
+}
+
+
+.axis--y path {
+  display: none;
+}
+
+.cities {
+  fill: none;
+  stroke: #aaa;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 0.1px;
+}
+
+.predicted {
+  fill: none;
+  stroke: #aaa;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 0.5px;
+}
+
+
+.city--hover {
+  stroke: #000;
+}
+
+.focus text {
+  text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.voronoi path {
+  fill: none;
+  pointer-events: all;
+}
+.true path {
+    fill: none;
+    stroke: #aaa;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-width: 3px;
+}
+.voronoi--show path {
+  stroke: red;
+  stroke-opacity: 0.2;
+}
+
+#form {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+}
