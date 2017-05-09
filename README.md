@@ -1,7 +1,7 @@
 Social Data Analysis and Visualization 02806 Final Project.
 
 The website for the final project can be reached here: http://www.student.dtu.dk/~s134859/Socialdata2017Yelp/
-The Explainer Notebook can be found here: 
+The Explainer Notebook can be found here: http://nbviewer.jupyter.org/github/NicolaiMogensen/YelpDataPrediction/blob/master/ExplainerNotebook.ipynb
 
 
 
